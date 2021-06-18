@@ -1,0 +1,44 @@
+{
+    "name": "telegram-bot",
+    "version": "1.1.0",
+    "description": "A simple telegram bot build with node js",
+    "main": "index.js",
+    "directories": {
+        "lib": "lib"
+    },
+    "dependencies": {
+        "akaneko": "^5.0.1",
+        "axios": "^0.21.1",
+        "brainly-scraper-v2": "^1.1.2",
+        "chalk": "^4.1.0",
+        "cheerio": "^1.0.0-rc.5",
+        "child_process": "^1.0.2",
+        "node-fetch": "^2.6.1",
+        "performance-now": "^2.1.0",
+        "ra-api": "^1.2.9",
+        "telegraf": "^4.3.0",
+        "util": "^0.12.4",
+        "yt-search": "^2.7.5",
+        "ytsr": "^3.4.1"
+    },
+    "devDependencies": {},
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/LoL-Human/TelegramBot-NodeJS.git"
+    },
+    "keywords": [
+        "telegram",
+        "bot",
+        "telegram-bot"
+    ],
+    "author": "LoL Human",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/LoL-Human/TelegramBot-NodeJS/issues"
+    },
+    "homepage": "https://github.com/LoL-Human/TelegramBot-NodeJS#readme"
+}
