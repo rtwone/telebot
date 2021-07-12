@@ -30,6 +30,10 @@ if (bot_token == "") {
     return console.log("=== BOT TOKEN CANNOT BE EMPTY ===")
 }
 
+const sleep = async (ms) => {
+return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const bot = new Telegraf(bot_token)
 
 function kyun(seconds) {
@@ -43,8 +47,8 @@ function kyun(seconds) {
         return `${pad(hours)}Hours, ${pad(minutes)}Minutes, ${pad(seconds)}Seconds`
 }
 
-bot.on("new_chat_members", async(lol) => {
-    var message = lol.message
+bot.on("new_chat_members", async(ryn) => {
+    var message = ryn.message
     var pp_group = await tele.getPhotoProfile(message.chat.id)
     var groupname = message.chat.title
     var groupmembers = await bot.telegram.getChatMembersCount(message.chat.id)
@@ -53,12 +57,12 @@ bot.on("new_chat_members", async(lol) => {
         var full_name = tele.getUser(x).full_name
         var id_mem = tele.getUser(x).username
         console.log(chalk.whiteBright("├"), chalk.cyanBright("[  JOINS  ]"), chalk.whiteBright(full_name), chalk.greenBright("join in"), chalk.whiteBright(groupname))
-        await lol.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/base/welcome?apikey=${apikey}&img1=${pp_user}&img2=${pp_group}&background=https://i.ibb.co/8B6Q84n/LTqHsfYS.jpg&username=${full_name}&member=${groupmembers}&groupname=${groupname}` }, { caption: 'Welcome @'+id_mem+'' })
+        await ryn.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/base/welcome?apikey=${apikey}&img1=${pp_user}&img2=${pp_group}&background=https://i.ibb.co/8B6Q84n/LTqHsfYS.jpg&username=${full_name}&member=${groupmembers}&groupname=${groupname}` }, { caption: 'Welcome @'+id_mem+'' })
     }
 })
 
-bot.on("left_chat_member", async(lol) => {
-    var message = lol.message
+bot.on("left_chat_member", async(ryn) => {
+    var message = ryn.message
     var pp_group = await tele.getPhotoProfile(message.chat.id)
     var pp_user = await tele.getPhotoProfile(message.left_chat_member.id)
     var pp_group = await tele.getPhotoProfile(message.chat.id)
@@ -68,37 +72,78 @@ bot.on("left_chat_member", async(lol) => {
     var full_name = tele.getUser(message.left_chat_member).full_name
     var id_mem = tele.getUser(message.left_chat_member).username
     console.log(chalk.whiteBright("├"), chalk.cyanBright("[  LEAVE  ]"), chalk.whiteBright(full_name), chalk.greenBright("leave from"), chalk.whiteBright(groupname))
-    await lol.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/base/leave?apikey=${apikey}&img1=${pp_user}&img2=${pp_group}&background=https://i.ibb.co/8B6Q84n/LTqHsfYS.jpg&username=${full_name}&member=${groupmembers}&groupname=${groupname}` }, { caption: 'Sayonara @'+id_mem+'' })
+    await ryn.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/base/leave?apikey=${apikey}&img1=${pp_user}&img2=${pp_group}&background=https://i.ibb.co/8B6Q84n/LTqHsfYS.jpg&username=${full_name}&member=${groupmembers}&groupname=${groupname}` }, { caption: 'Sayonara @'+id_mem+'' })
 })
 
-bot.command('start', async(lol) => {
-    user = tele.getUser(lol.message.from)
-    await help.start(lol, user.full_name)
-    await lol.deleteMessage()
+bot.command('start', async(ryn) => {
+    user = tele.getUser(ryn.message.from)
+    await help.start(ryn, user.full_name, user)
+    await ryn.deleteMessage()
 })
 
-bot.command('help', async(lol) => {
-    user = tele.getUser(lol.message.from)
-    await help.help(lol, user.full_name, lol.message.from.id.toString())
+bot.command('help', async(ryn) => {
+    user = tele.getUser(ryn.message.from)
+    await help.help(ryn, user.full_name, ryn.message.from.id.toString())
 })
 
-bot.on("callback_query", async(lol) => {
-    cb_data = lol.callbackQuery.data.split("-")
+bot.command('owner', async(ryn) => {
+    user = tele.getUser(ryn.message.from)
+    pushname = user.full_name
+                 r = `'`
+                 teks = 'Hello '+pushname+' Here'+r+'s info about the owner Chitanda Eru Bot'+r+'s ✨'
+                 options = {
+                     reply_markup: {
+                        inline_keyboard: [
+                          [
+                            { text: 'Telegram 📲', url: 'https://t.me/rtwone' },
+                            { text: 'Instagram 📸', url: 'https://instagram.com/yannnnn.zz_' }
+                          ],
+                          [
+                            { text: 'WhatsApp 💌', url: 'https://wa.me/6285791458996' },
+                            { text: 'About Me 📌', url: 'https://irfanhariyanto.tk/' }
+                          ],
+                       ]
+                    }
+                 }
+                 try {
+                     await ryn.editMessageText(teks, options)
+                 } catch {
+                     await ryn.reply(teks, options)
+                 }
+})
+
+bot.command('snk', async(ryn) => {
+        var teks = `@ChtndEru_Bot merupakan suatu program bot Telegram, yang menggunakan engine nodejs v14.x.x
+Adapun ketentuan untuk memakai Chitanda Eru Bot :
+1. Pengguna dapat menggunakan semua perintah/command secara gratis dan tidak melakukan spam terhadap bot.
+2. Rules yang harus dipatuhi oleh pengguna antara lain :
+  • Tidak melakukan spam perintah/command yang ada dalam bot ini
+3. Dilarang keras mengirim pesan yang membuat server down ataupun bot crash
+4. Pengguna yang mengirim hal atau data pribadi tidak akan disimpan oleh bot ini, dan tidak akan bertanggung jawab atas data pribadi tersebut!
+
+Note : Gunakan Bot Ini Dengan Baik!
+
+Regards : Irfan Hariyanto || @rtwone`
+     ryn.reply(teks)
+})
+
+bot.on("callback_query", async(ryn) => {
+    cb_data = ryn.callbackQuery.data.split("-")
     user_id = Number(cb_data[1])
-    if (lol.callbackQuery.from.id != user_id) return lol.answerCbQuery("Sorry, You do not have the right to access this button.", { show_alert: true })
+    if (ryn.callbackQuery.from.id != user_id) return ryn.answerCbQuery("Sorry, You do not have the right to access this button.", { show_alert: true })
     callback_data = cb_data[0]
-    user = tele.getUser(lol.callbackQuery.from)
-    const isGroup = lol.chat.type.includes("group")
-    const groupName = isGroup ? lol.chat.title : ""
+    user = tele.getUser(ryn.callbackQuery.from)
+    const isGroup = ryn.chat.type.includes("group")
+    const groupName = isGroup ? ryn.chat.title : ""
     if (!isGroup) console.log(chalk.whiteBright("├"), chalk.cyanBright("[ ACTIONS ]"), chalk.whiteBright(callback_data), chalk.greenBright("from"), chalk.whiteBright(user.full_name))
     if (isGroup) console.log(chalk.whiteBright("├"), chalk.cyanBright("[ ACTIONS ]"), chalk.whiteBright(callback_data), chalk.greenBright("from"), chalk.whiteBright(user.full_name), chalk.greenBright("in"), chalk.whiteBright(groupName))
-    if (callback_data == "help") return await help[callback_data](lol, user.full_name, user_id)
-    await help[callback_data](lol, user_id.toString())
+    if (callback_data == "help") return await help[callback_data](ryn, user.full_name, user_id)
+    await help[callback_data](ryn, user_id.toString())
 })
 
-bot.on("message", async(lol) => {
+bot.on("message", async(ryn) => {
     try {
-        const body = lol.message.text || lol.message.caption || ""
+        const body = ryn.message.text || ryn.message.caption || ""
         comm = body.trim().split(" ").shift().toLowerCase()
         cmd = false
         if (prefix != "" && body.startsWith(prefix)) {
@@ -106,32 +151,33 @@ bot.on("message", async(lol) => {
             comm = body.slice(1).trim().split(" ").shift().toLowerCase()
         }
         const command = comm
-        const args = await tele.getArgs(lol)
-        const user = tele.getUser(lol.message.from)
+        const args = await tele.getArgs(ryn)
+        const user = tele.getUser(ryn.message.from)
         const sender = user.first_name
+        const pushname = user.full_name
         const ownerID = ["rtwone"]
         const isOwner = ownerID.includes(user.username)
         const reply = async(text) => {
             for (var x of range(0, text.length, 4096)) {
-                return await lol.replyWithMarkdown(text.substr(x, 4096), { disable_web_page_preview: true })
+                return await ryn.replyWithMarkdown(text.substr(x, 4096), { disable_web_page_preview: true })
             }
         }
 
         const isCmd = cmd
-        const isGroup = lol.chat.type.includes("group")
-        const groupName = isGroup ? lol.chat.title : ""
+        const isGroup = ryn.chat.type.includes("group")
+        const groupName = isGroup ? ryn.chat.title : ""
 
-        const isImage = lol.message.hasOwnProperty("photo")
-        const isVideo = lol.message.hasOwnProperty("video")
-        const isAudio = lol.message.hasOwnProperty("audio")
-        const isSticker = lol.message.hasOwnProperty("sticker")
-        const isContact = lol.message.hasOwnProperty("contact")
-        const isLocation = lol.message.hasOwnProperty("location")
-        const isDocument = lol.message.hasOwnProperty("document")
-        const isAnimation = lol.message.hasOwnProperty("animation")
+        const isImage = ryn.message.hasOwnProperty("photo")
+        const isVideo = ryn.message.hasOwnProperty("video")
+        const isAudio = ryn.message.hasOwnProperty("audio")
+        const isSticker = ryn.message.hasOwnProperty("sticker")
+        const isContact = ryn.message.hasOwnProperty("contact")
+        const isLocation = ryn.message.hasOwnProperty("location")
+        const isDocument = ryn.message.hasOwnProperty("document")
+        const isAnimation = ryn.message.hasOwnProperty("animation")
         const isMedia = isImage || isVideo || isAudio || isSticker || isContact || isLocation || isDocument || isAnimation
 
-        const quotedMessage = lol.message.reply_to_message || {}
+        const quotedMessage = ryn.message.reply_to_message || {}
         const isQuotedImage = quotedMessage.hasOwnProperty("photo")
         const isQuotedVideo = quotedMessage.hasOwnProperty("video")
         const isQuotedAudio = quotedMessage.hasOwnProperty("audio")
@@ -140,7 +186,7 @@ bot.on("message", async(lol) => {
         const isQuotedLocation = quotedMessage.hasOwnProperty("location")
         const isQuotedDocument = quotedMessage.hasOwnProperty("document")
         const isQuotedAnimation = quotedMessage.hasOwnProperty("animation")
-        const isQuoted = lol.message.hasOwnProperty("reply_to_message")
+        const isQuoted = ryn.message.hasOwnProperty("reply_to_message")
 
         var typeMessage = body.substr(0, 50).replace(/\n/g, '')
         if (isImage) typeMessage = "Image"
@@ -159,12 +205,12 @@ bot.on("message", async(lol) => {
 
         var file_id = ""
         if (isQuoted) {
-            file_id = isQuotedImage ? lol.message.reply_to_message.photo[lol.message.reply_to_message.photo.length - 1].file_id :
-                isQuotedVideo ? lol.message.reply_to_message.video.file_id :
-                isQuotedAudio ? lol.message.reply_to_message.audio.file_id :
-                isQuotedDocument ? lol.message.reply_to_message.document.file_id :
-                isQuotedSticker ? lol.message.reply_to_message.sticker.file_id :
-                isQuotedAnimation ? lol.message.reply_to_message.animation.file_id : ""
+            file_id = isQuotedImage ? ryn.message.reply_to_message.photo[ryn.message.reply_to_message.photo.length - 1].file_id :
+                isQuotedVideo ? ryn.message.reply_to_message.video.file_id :
+                isQuotedAudio ? ryn.message.reply_to_message.audio.file_id :
+                isQuotedDocument ? ryn.message.reply_to_message.document.file_id :
+                isQuotedSticker ? ryn.message.reply_to_message.sticker.file_id :
+                isQuotedAnimation ? ryn.message.reply_to_message.animation.file_id : ""
         }
         var mediaLink = file_id != "" ? await tele.getLink(file_id) : ""
         
@@ -228,28 +274,39 @@ bot.on("message", async(lol) => {
         };
 
         switch (command) {
-            case 'riyan':
-                 await reply('Hai '+user.full_name+'!, Perkenalkan nama Saya *Irfan Hariyanto*, bisa juga di panggil *Riyan*, Asal Sumenep, Madura. Umur 14y.o\n\n\nJika ingin mengenal saya lebih dalam lagi, silahkan kunjungi saja website saya : _https://irfanhariyanto.tk/_')
-                 break
             case 'owner':
-                 teks = `Owner Rtwone Bot
-• Telegram: @rtwone
-• Instagram: yannnnn.zz_
-• WhatsApp: 6285791458996
-• About: /riyan`
-                 urll = 'https://i.ibb.co/C6rf34V/ebe6755ab900.jpg'
-                 lol.replyWithPhoto({ url: urll }, { caption: teks })
+                 r = `'`
+                 teks = 'Hello '+pushname+' Here'+r+'s info about the owner Chitanda Eru Bot'+r+'s ✨'
+                 options = {
+                     reply_markup: {
+                        inline_keyboard: [
+                          [
+                            { text: 'Telegram 📲', url: 't.me/rtwone' },
+                            { text: 'Instagram 📸', url: 'https://instagram.com/yannnnn.zz_' }
+                          ],
+                          [
+                            { text: 'WhatsApp 💌', url: 'https://wa.me/6285791458996' },
+                            { text: 'About Me 📌', url: 'https://irfanhariyanto.tk/' }
+                          ],
+                       ]
+                    }
+                 }
+                 try {
+                     await ryn.editMessageText(teks, options)
+                 } catch {
+                     await ryn.reply(teks, options)
+                 }
                  break
             case 'ppcp':
             case 'ppcouple':
                  try {
                  reply('Tunggu sebentar, sedang di proses!')
                  hasil = await fetchJson('https://lindow-api.herokuapp.com/api/ppcouple?apikey=YannzAe')
-                 lol.replyWithPhoto({ url: hasil.result.male })
-                 lol.replyWithPhoto({ url: hasil.result.female })
+                 ryn.replyWithPhoto({ url: hasil.result.male })
+                 ryn.replyWithPhoto({ url: hasil.result.female })
                  } catch (e) {
                  console.log(e)
-                 lol.reply('Error Please Report To /owner')
+                 ryn.reply('Error Please Report To /owner')
                  }
                  break
             case 'runtime':
@@ -280,7 +337,7 @@ bot.on("message", async(lol) => {
                  if (args.length < 1) return reply(`Contoh :\n${prefix}spamcall 62xxxx`)
                  call = `${body.slice(12)}`
                  anu = await fetchJson(`https://lindow-python-api.herokuapp.com/api/spamcall?no=${call}`, {method: 'get'})
-                 lol.reply(anu.logs)
+                 ryn.reply(anu.logs)
                  break
             case 'igstalk':
                 if (!args.length)  return reply(`Ketik ${prefix}igstalk username`)
@@ -312,9 +369,9 @@ Video : ${vid_post_}
 ❏ Jumlah Postingan : ${postsCount}
 ❏ Biodata : ${biography}
 ❏ Jumlah Post : ${userr.posts.length}`
-             await lol.replyWithPhoto({ url: profilePicHD }, { caption: captuserig, parse_mode: "Markdown"}).catch(e => {
-             lol.replyWithPhoto({ url: profilePicHD })
-             lol.reply(captuserig)
+             await ryn.replyWithPhoto({ url: profilePicHD }, { caption: captuserig, parse_mode: "Markdown"}).catch(e => {
+             ryn.replyWithPhoto({ url: profilePicHD })
+             ryn.reply(captuserig)
              })
         } catch (e) {
             console.log(e)
@@ -323,7 +380,7 @@ Video : ${vid_post_}
           break
             case 'help':
             case 'menu':
-                await help.help(lol, user.full_name, lol.message.from.id.toString())
+                await help.help(ryn, user.full_name, ryn.message.from.id.toString())
                 break
             case 'slot':
                 const sotoy = [
@@ -381,7 +438,7 @@ Video : ${vid_post_}
                 reply('_30 Detik lagi…_')
                 }, 2500) // 1000 = 1s,
                 setTimeout( () => {
-                lol.replyWithPhoto({ url: anu.result.images }, {caption: `Jawablah pertanyaan diatas\n\nWaktu : 30 detik`})
+                ryn.replyWithPhoto({ url: anu.result.images }, {caption: `Jawablah pertanyaan diatas\n\nWaktu : 30 detik`})
                 }, 0) // 1000 = 1s,
                 break
             case 'brainly':
@@ -402,7 +459,7 @@ Video : ${vid_post_}
                 nn = args.join(' ')
                 atas = nn.split("|")[0];
                 bawah = nn.split("|")[1];
-                lol.replyWithPhoto({ url: `http://api.lolhuman.xyz/api/memegen?apikey=${apikey}&texttop=${atas}&textbottom=${bawah}&img=${mediaLink}` })
+                ryn.replyWithPhoto({ url: `http://api.lolhuman.xyz/api/memegen?apikey=${apikey}&texttop=${atas}&textbottom=${bawah}&img=${mediaLink}` })
                 break
            case 'shortlink':
                 if (!args.length) return reply(`Linknya? Example: ${prefix + command} https://irfanhariyanto.tk/`)
@@ -438,7 +495,7 @@ Video : ${vid_post_}
                 break
             case 'asupan':
                 reply('Tunggu sebentar, sedang di proses!')
-                await lol.replyWithVideo({ url:`https://lindow-api.herokuapp.com/api/asupan?apikey=LindowApi` })
+                await ryn.replyWithVideo({ url:`https://lindow-api.herokuapp.com/api/asupan?apikey=LindowApi` })
                 break
             case 'alquran':
                 if (args.length < 1) return await reply(`Example: ${prefix + command} 18 or ${prefix + command} 18/10 or ${prefix + command} 18/1-10`)
@@ -464,7 +521,7 @@ Video : ${vid_post_}
                 if (args.length == 0) return await reply(`Example: ${prefix + command} 18 or ${prefix + command} 18/10`)
                 reply('Tunggu sebentar, sedang di proses!')
                 surah = args[0]
-                await lol.replyWithAudio({ url: `https://api.lolhuman.xyz/api/quran/audio/${surah}?apikey=${apikey}` }).catch(e => {
+                await ryn.replyWithAudio({ url: `https://api.lolhuman.xyz/api/quran/audio/${surah}?apikey=${apikey}` }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -541,11 +598,11 @@ Video : ${vid_post_}
 
 *Tunggu sebentar sedang mengirim audio*
 `
-await lol.replyWithPhoto({ url: resto.all[0].image }, { caption: thumbInfo, parse_mode: "Markdown" })
+await ryn.replyWithPhoto({ url: resto.all[0].image }, { caption: thumbInfo, parse_mode: "Markdown" })
 var restoo = await y2mateA(resto.all[0].url).catch(e => {
 reply('*[ ! ] Error saat memasuki web y2mate*')
 })
-await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { thumb: resto.all[0].image })
+await ryn.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { thumb: resto.all[0].image })
                 break
             case 'ytsearch':
                 if (args.length == 0) return await reply(`Example: ${prefix + command} Melukis Senja`)
@@ -558,7 +615,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 var hitung = 1
                 for (let i = 0; i < items.length; i++) {
                     hehe = `*── 「 YTSEARCH 」 ──*\n\n*Judul :* ${items[i].title}\n*ID :* ${items[i].id}\n*Ditonton :* ${items[i].views}\n*Durasi :* ${items[i].duration}\n*Link :* ${items[i].url}`
-                await lol.replyWithPhoto({ url: items[i].bestThumbnail.url }, { caption: hehe, parse_mode: "Markdown" })
+                await ryn.replyWithPhoto({ url: items[i].bestThumbnail.url }, { caption: hehe, parse_mode: "Markdown" })
                 }
             } catch(e) {
                 reply('Didn\'t find anything or there is any error!')
@@ -583,8 +640,8 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
 
 *Tunggu sebentar sedang mengirim audio*
 `
-                await lol.replyWithPhoto({ url: ress[0].thumb }, { caption: resultnya, parse_mode: "Markdown" })
-                await lol.replyWithAudio({ url: ress[0].link, filename: ress[0].output }).catch(e => {
+                await ryn.replyWithPhoto({ url: ress[0].thumb }, { caption: resultnya, parse_mode: "Markdown" })
+                await ryn.replyWithAudio({ url: ress[0].link, filename: ress[0].output }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -607,8 +664,8 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
 
 *Tunggu sebentar sedang mengirim video*
 `
-                await lol.replyWithPhoto({ url: ress[0].thumb }, { caption: resultnya, parse_mode: "Markdown" })
-                await lol.replyWithVideo({ url: ress[0].link}).catch(e => {
+                await ryn.replyWithPhoto({ url: ress[0].thumb }, { caption: resultnya, parse_mode: "Markdown" })
+                await ryn.replyWithVideo({ url: ress[0].link}).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -618,7 +675,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 reply('Tunggu sebentar, sedang di proses!')
                 url = args[0]
                 ra_api.TiktokDownloader(url).then(async r => {
-                await lol.replyWithVideo({ url: r.result.nowm }).catch(e => {
+                await ryn.replyWithVideo({ url: r.result.nowm }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })})
@@ -631,9 +688,9 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                  ini_url = ini_url2.result.url
                  ini_caption = ini_url2.result.caption
                  if (ini_url.includes(".jpg")) {
-                 ini_type = lol.replyWithPhoto({ url: ini_url }, { caption: ini_caption })
+                 ini_type = ryn.replyWithPhoto({ url: ini_url }, { caption: ini_caption })
                  } else if (ini_url.includes(".mp4")) {
-                 ini_type = lol.replyWithVideo({ url: ini_url }, { caption: ini_caption })
+                 ini_type = ryn.replyWithVideo({ url: ini_url }, { caption: ini_caption })
                  }
                  return ini_type
                  break
@@ -643,7 +700,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 urll = args[0]
                 url = `https://api.lolhuman.xyz/api/twitter?apikey=${apikey}&url=${urll}`
                 result = await fetchJson(url)
-                await lol.replyWithVideo({ url: result.result[2].link }, { caption: result.result.title }).catch(e => {
+                await ryn.replyWithVideo({ url: result.result[2].link }, { caption: result.result.title }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -653,8 +710,8 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 reply('Tunggu sebentar, sedang di proses!')
                 var resut = await axios.get(`https://fazone-api.herokuapp.com/api/spotifydl?url=${args[0]}&apikey=bebas1minggu`)
                 caption = `*── 「 SPOTIFY 」 ──*\n\n➸ *Judul :* ${resut.data.title}\n➸ *Artis :* ${resut.data.artists}\n➸ *ID :* ${resut.data.id}\n➸ *Original url :* ${resut.data.original_url}\n➸ *Popularity :* ${resut.data.popularity}\n➸ *Preview :* ${resut.data.preview_url}`
-                await lol.replyWithPhoto({ url: resut.data.thumbnail }, { caption: caption, parse_mode: "Markdown" })
-                await lol.replyWithAudio({ url: resut.data.result }, { title: resut.data.title, thumb: resut.data.thumbnail }).catch(e => {
+                await ryn.replyWithPhoto({ url: resut.data.thumbnail }, { caption: caption, parse_mode: "Markdown" })
+                await ryn.replyWithAudio({ url: resut.data.result }, { title: resut.data.title, thumb: resut.data.thumbnail }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -664,15 +721,15 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 reply('Tunggu sebentar, sedang di proses!')
                 var resut = await axios.get(`https://fazone-api.herokuapp.com/api/spotifyplay?judul=${body.slice(13)}&apikey=LindowApi`)
                 caption = `*── 「 SPOTIFY 」 ──*\n\n➸ *Judul :* ${resut.data.title}\n➸ *Artis :* ${resut.data.artists}\n➸ *ID :* ${resut.data.id}\n➸ *Original url :* ${resut.data.original_url}\n➸ *Popularity :* ${resut.data.popularity}\n➸ *Preview :* ${resut.data.preview_url}`
-                await lol.replyWithPhoto({ url: resut.data.thumbnail }, { caption: caption, parse_mode: "Markdown" })
-                await lol.replyWithAudio({ url: resut.data.result }, { title: resut.data.title, thumb: resut.data.thumbnail }).catch(e => {
+                await ryn.replyWithPhoto({ url: resut.data.thumbnail }, { caption: caption, parse_mode: "Markdown" })
+                await ryn.replyWithAudio({ url: resut.data.result }, { title: resut.data.title, thumb: resut.data.thumbnail }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
                 break
             case 'randomaesthetic':
                reply('Tunggu sebentar, sedang di proses!')
-               await lol.replyWithVideo({ url: 'https://lindow-api.herokuapp.com/api/randomaesthetic?apikey=LindowApi' })
+               await ryn.replyWithVideo({ url: 'https://lindow-api.herokuapp.com/api/randomaesthetic?apikey=LindowApi' })
                break
             case 'jooxplay':
                 if (args.length == 0) return await reply(`Example: ${prefix + command} Melukis Senja`)
@@ -687,12 +744,12 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 caption += `\`❖ Uploaded :\` *${result.info.date}*\n`
                 caption += `\`❖ Lirik    :\`\n`
                 if ((caption + result.lirik).length >= 1024) {
-                    await lol.replyWithPhoto({ url: result.image }, { caption: caption, parse_mode: "Markdown" })
-                    await lol.replyWithMarkdown(result.lirik)
+                    await ryn.replyWithPhoto({ url: result.image }, { caption: caption, parse_mode: "Markdown" })
+                    await ryn.replyWithMarkdown(result.lirik)
                 } else {
-                    await lol.replyWithPhoto({ url: result.image }, { caption: caption + result.lirik, parse_mode: "Markdown" })
+                    await ryn.replyWithPhoto({ url: result.image }, { caption: caption + result.lirik, parse_mode: "Markdown" })
                 }
-                await lol.replyWithAudio({ url: result.audio[0].link, filename: result.info.song }, { thumb: result.image })
+                await ryn.replyWithAudio({ url: result.audio[0].link, filename: result.info.song }, { thumb: result.image })
                 break
             case 'pinterest':
                 if (args.length == 0) return await reply(`Example: ${prefix + command} loli kawaii`)
@@ -700,7 +757,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 query = args.join(" ")
                 var r = await ra_api.pinterest(query)
                 urll = pickRandom(r.result)
-                await lol.replyWithPhoto({ url: urll }).catch(e => {
+                await ryn.replyWithPhoto({ url: urll }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -709,7 +766,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 if (args.length == 0) return await reply(`Example: ${prefix + command} https://id.pinterest.com/pin/696580267364426905/`)
                 reply('Tunggu sebentar, sedang di proses!')
                 var url = await axios.get(`https://fazone-api.herokuapp.com/api/pindl?url=${args[0]}&apikey=LindowApi`)
-                await lol.replyWithVideo({ url: url.data.result1 }).catch(e => {
+                await ryn.replyWithVideo({ url: url.data.result1 }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -718,7 +775,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 if (args.length == 0) return await reply(`Example: ${prefix + command} https://id.pinterest.com/pin/696580267364426905/`)
                 reply('Tunggu sebentar, sedang di proses!')
                 var url = await axios.get(`https://fazone-api.herokuapp.com/api/pindl?url=${args[0]}&apikey=LindowApi`)
-                await lol.replyWithPhoto({ url: url.data.result2 }).catch(e => {
+                await ryn.replyWithPhoto({ url: url.data.result2 }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -727,7 +784,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 if (args.length == 0) return await reply(`Example: ${prefix + command} loli kawaii`)
                 reply('Tunggu sebentar, sedang di proses!')
                 query = args.join(" ")
-                await lol.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/pixiv?apikey=${apikey}&query=${query}` }).catch(e => {
+                await ryn.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/pixiv?apikey=${apikey}&query=${query}` }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -736,7 +793,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 if (args.length == 0) return await reply(`Example: ${prefix + command} 63456028`)
                 reply('Tunggu sebentar, sedang di proses!')
                 pixivid = args[0]
-                await lol.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/pixivdl/${pixivid}?apikey=${apikey}` }).catch(e => {
+                await ryn.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/pixivdl/${pixivid}?apikey=${apikey}` }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -758,7 +815,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                         ]
                     }
                 }
-                await lol.reply(`Found result`, options)
+                await ryn.reply(`Found result`, options)
                 break
 
                 // AniManga //
@@ -778,7 +835,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                     text += `- ${x.title.romaji} (${x.title.native})\n`
                 }
                 text += `\nDescription : \n${result.description.replace(/__/g, "_")}`
-                await lol.replyWithPhoto({ url: result.image.large }, { caption: text }).catch(e => {
+                await ryn.replyWithPhoto({ url: result.image.large }, { caption: text }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -810,7 +867,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                     text += `- ${x.name.full} (${x.name.native})\n`
                 }
                 text += `\nDescription : ${result.description}`
-                await lol.replyWithPhoto({ url: result.coverImage.large }, { caption: text }).catch(e => {
+                await ryn.replyWithPhoto({ url: result.coverImage.large }, { caption: text }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })
@@ -844,15 +901,15 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                     text += `- ${x.name.full} (${x.name.native})\n`
                 }
                 text += `\nDescription : ${result.description}`
-                await lol.replyWithPhoto({ url: result.coverImage.large }, { caption: text })
+                await ryn.replyWithPhoto({ url: result.coverImage.large }, { caption: text })
                 break
             case 'stickertoimg':
             case 'toimg':
-                 if (!isQuotedSticker) return lol.reply('reply stickernya!')
+                 if (!isQuotedSticker) return ryn.reply('reply stickernya!')
                  reply('Tunggu sebentar, sedang di proses!')
                  if (isQuotedSticker) {
                  url_file = await tele.getLink(file_id)
-                 lol.replyWithPhoto({ url: url_file })
+                 ryn.replyWithPhoto({ url: url_file })
                  }
                  break
             case 'tourl':
@@ -863,11 +920,11 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                  }
                  break
             case 'tomp3':
-                 if (!isQuotedVideo) return lol.reply('reply vidionya!')
+                 if (!isQuotedVideo) return ryn.reply('reply vidionya!')
                  reply('Tunggu sebentar, sedang di proses!')
                  if (isQuotedVideo) {
                  urll = mediaLink
-                 lol.replyWithAudio({ url: urll, filename: sender+'.mp3' }).catch(e => {                                console.log(e)
+                 ryn.replyWithAudio({ url: urll, filename: sender+'.mp3' }).catch(e => {                                console.log(e)
                  reply(`Error, please report owner`)
                  })
                  }
@@ -886,7 +943,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                     text += `At : ${result.at}\n`
                     text += `Episode : ${result.episode}\n`
                     text += `Similarity : ${result.similarity}`
-                    await lol.replyWithVideo({ url: result.video }, { caption: text })
+                    await ryn.replyWithVideo({ url: result.video }, { caption: text })
                 } else {
                     reply(`Tag gambar yang sudah dikirim`)
                 }
@@ -915,9 +972,9 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                     }
                 }
                 if (text.length <= 1024) {
-                    return await lol.replyWithPhoto({ url: result.thumbnail }, { caption: text })
+                    return await ryn.replyWithPhoto({ url: result.thumbnail }, { caption: text })
                 }
-                await lol.replyWithPhoto({ url: result.thumbnail })
+                await ryn.replyWithPhoto({ url: result.thumbnail })
                 await reply(text)
                 break
             case 'kusonimesearch':
@@ -945,9 +1002,9 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                     }
                 }
                 if (text.length <= 1024) {
-                    return await lol.replyWithPhoto({ url: result.thumbnail }, { caption: text })
+                    return await ryn.replyWithPhoto({ url: result.thumbnail }, { caption: text })
                 }
-                await lol.replyWithPhoto({ url: result.thumbnail })
+                await ryn.replyWithPhoto({ url: result.thumbnail })
                 await reply(text)
                 break
             case 'otakudesu':
@@ -1039,7 +1096,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 text += `Date Release : ${result.date_release}\n`
                 text += `Language : ${result.language}\n`
                 text += `Link Download : ${result.link_dl}`
-                await lol.replyWithPhoto({ url: result.thumbnail }, { caption: text })
+                await ryn.replyWithPhoto({ url: result.thumbnail }, { caption: text })
                 break
             case 'drakorongoing':
                 reply('Tunggu sebentar, sedang di proses!')
@@ -1072,7 +1129,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 text += `Pages : ${result.pages}\n`
                 text += `Description : ${result.desc}\n\n`
                 text += `Story : \n${result.story}`
-                await lol.replyWithPhoto({ url: result.photo }, { caption: text })
+                await ryn.replyWithPhoto({ url: result.photo }, { caption: text })
                 break
             case 'wattpadsearch':
                 if (args.length == 0) return await reply(`Example: ${prefix + command} Tere Liye`)
@@ -1107,8 +1164,8 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 text = `Title : ${result.title}\n`
                 text += `Desc : ${result.desc}\n`
                 text += `Story :\n${result.story}\n`
-                await lol.replyWithPhoto({ url: result.thumbnail })
-                lol.reply(text)
+                await ryn.replyWithPhoto({ url: result.thumbnail })
+                ryn.reply(text)
                 break
 
                 // Random Text //
@@ -1137,7 +1194,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 break
             case 'quotesimage':
                 reply('Tunggu sebentar, sedang di proses!')
-                await lol.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/random/${command}?apikey=${apikey}` })
+                await ryn.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/random/${command}?apikey=${apikey}` })
                 break
             case 'faktaunik':
             case 'katabijak':
@@ -1158,7 +1215,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
             case 'bts':
             case 'exo':
             case 'elf':
-            case 'loli':
+            case 'ryni':
             case 'neko':
             case 'waifu':
             case 'shota':
@@ -1168,7 +1225,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
             case 'megumin':
             case 'wallnime':
                 reply('Tunggu sebentar, sedang di proses!')
-                await lol.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/random/${command}?apikey=${apikey}` })
+                await ryn.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/random/${command}?apikey=${apikey}` })
                 break
             case 'chiisaihentai':
             case 'trap':
@@ -1177,7 +1234,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
             case 'ecchi':
             case 'hentai':
             case 'ahegao':
-            case 'hololewd':
+            case 'horynewd':
             case 'sideoppai':
             case 'animefeets':
             case 'animebooty':
@@ -1190,7 +1247,7 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
             case 'animebellybutton':
             case 'hentai4everyone':
                 reply('Tunggu sebentar, sedang di proses!')
-                await lol.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/random/nsfw/${command}?apikey=${apikey}` })
+                await ryn.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/random/nsfw/${command}?apikey=${apikey}` })
                 break
             case 'bj':
             case 'ero':
@@ -1235,12 +1292,19 @@ await lol.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
             case 'kemonomimi':
             case 'nsfw_avatar':
                 reply('Tunggu sebentar, sedang di proses!')
-                await lol.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/random2/${command}?apikey=${apikey}` })
+                await ryn.replyWithPhoto({ url: `https://api.lolhuman.xyz/api/random2/${command}?apikey=${apikey}` })
                 break
             case 'test':
-                test = await bot.telegram.getChatMembersCount(lol.message.chat.id)
+                test = await bot.telegram.getChatMembersCount(ryn.message.chat.id)
                 console.log(test)
                 break
+            case 'leave':
+            if (!isOwner) return reply('Owner Bot Only!')
+            if (!isGroup) return reply('Group Only!')
+            ryn.reply('Byee...')
+            await sleep(2000)
+            ryn.leaveChat(ryn.message.chat.title)
+            break
             default:
 if (body.startsWith('$')){
 if (!isOwner) return reply('Owner Bot Only!')
@@ -1248,7 +1312,7 @@ var konsol = body.slice(2)
 exec(konsol, async (err, stdout) => {
 if(err) return reply(`${err}`)
 if (stdout) {
-await lol.reply(`${stdout}`)
+await ryn.reply(`${stdout}`)
 }
 })
 }
@@ -1261,7 +1325,7 @@ bang = util.format(sat)
 if (sat == undefined){
 bang = util.format(sul)
 }
-return await lol.reply(bang)
+return await ryn.reply(bang)
 }
 try {
 reply(util.format(eval(`;(async () => { ${konsol} })()`).catch(e => {
@@ -1279,7 +1343,7 @@ if (js == '{}') js = { err }
 th = '```'
 js = JSON.stringify(js, null, 2)
 js = `${th}${js}${th}`
-await lol.reply(`_${err}_\n\n` + js) 
+await ryn.reply(`_${err}_\n\n` + js) 
 }
 }
     }
