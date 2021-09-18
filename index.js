@@ -155,7 +155,7 @@ bot.on("message", async(ryn) => {
         const user = tele.getUser(ryn.message.from)
         const sender = user.first_name
         const pushname = user.full_name
-        const ownerID = ["rtwone"]
+        const ownerID = ["yknsjkkk"]
         const isOwner = ownerID.includes(user.username)
         const reply = async(text) => {
             for (var x of range(0, text.length, 4096)) {
