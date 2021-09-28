@@ -3,6 +3,7 @@ const { fetchJson, range, parseMarkdown } = require('./lib/function')
 const { Telegraf } = require('telegraf')
 const help = require('./lib/help')
 const tele = require('./lib/tele')
+const { TiktokDownloader } = require("./lib/tiktok")
 const { exec, spawn } = require("child_process")
 const chalk = require('chalk')
 const { getUser, getPost, searchUser } = require('./lib/Insta.js')
@@ -674,8 +675,8 @@ await ryn.replyWithAudio({ url: restoo[0].link, filename: restoo[0].output }, { 
                 if (args.length == 0) return await reply(`Example: ${prefix + command} https://vt.tiktok.com/ZSwWCk5o/`)
                 reply('Tunggu sebentar, sedang di proses!')
                 url = args[0]
-                ra_api.TiktokDownloader(url).then(async r => {
-                await ryn.replyWithVideo({ url: r.result.nowm }).catch(e => {
+                TiktokDownloader(url).then(async r => {
+                await ryn.replyWithVideo({ url: r.result.link.nowatermark }).catch(e => {
                 console.log(e)
                 reply(`Error, please report owner`)
                 })})
